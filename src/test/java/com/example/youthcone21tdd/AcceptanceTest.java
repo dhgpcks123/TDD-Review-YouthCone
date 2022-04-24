@@ -3,6 +3,7 @@ package com.example.youthcone21tdd;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
@@ -36,14 +37,27 @@ class AcceptanceTest {
     int port;
     //포트 번호 확인 가능
 
+    @Autowired
+    ReviewRepository reviewRepository;
+
     @BeforeEach
     void setUp(){
         RestAssured.port = port;
     }
 
+    private Long id = 1L;
+    private String content = "재밌어요";
+    private String phoneNumber = "010-1111-2222";
+
     @Test
     void 후기_조회_성공(){
         //given, arrange, 준비
+        reviewRepository.save(
+                Review.builder()
+                        .content(content)
+                        .phoneNumber(phoneNumber).build()
+        );
+
         given()
                 .accept(MediaType.APPLICATION_JSON_VALUE)
         //when, act, 실행
@@ -53,9 +67,9 @@ class AcceptanceTest {
         .then()
                 .statusCode(HttpStatus.OK.value())
                 .assertThat()
-                .body("id", equalTo(1))
-                .body("content", equalTo("재밌어요"))
-                .body("phoneNumber", equalTo("010-1111-2222"));
+                .body("id", equalTo(id.intValue()))
+                .body("content", equalTo(content))
+                .body("phoneNumber", equalTo(phoneNumber));
     }
     @Test
     void 후기_조회_실패(){
