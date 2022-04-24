@@ -43,4 +43,28 @@ public class ReviewControllerTest {
                 .andExpect(jsonPath("content").value(content))
                 .andExpect(jsonPath("phoneNumber").value(phoneNumber));
     }
+
+    @Test
+    void 후기_조회_실패() throws Exception {
+        // given
+        given(reviewService.getById(1000L))
+                .willThrow(new ReviewNotFoundException("review id" + 1000));
+        // when
+        ResultActions resultActions = mockMvc.perform(get("/reviews/"+1000));
+        // then
+        resultActions
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void 선물하기_성공() throws Exception, SendGiftInternalException, DuplicateSendGiftException {
+        given(reviewService.sendGift(id))
+                .willReturn(new Review(id, content, phoneNumber, true));
+
+        ResultActions resultActions = mockMvc.perform(put("/reviews/" + id));
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("isSent").value(true));
+    }
 }

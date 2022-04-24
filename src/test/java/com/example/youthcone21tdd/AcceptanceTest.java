@@ -73,11 +73,56 @@ class AcceptanceTest {
     }
     @Test
     void 후기_조회_실패(){
+        //given, arrange, 준비
+        reviewRepository.save(
+                Review.builder()
+                        .content(content)
+                        .phoneNumber(phoneNumber).build()
+        );
 
+        given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        //when, act, 실행
+        .when()
+                .get("/reviews/1000")
+        //then, assert, 검증
+        .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
     @Test
     void 선물하기_성공(){
+        reviewRepository.save(
+                Review.builder()
+                        .content(content)
+                        .phoneNumber(phoneNumber)
+                        .build()
+        );
+        given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+                    .put("/reviews/1")
+        .then()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("isSent", equalTo(true));
+    }
 
+
+    // @author: hyechan, @since: 2022/04/24 2:48 오후
+    @Test
+    void 선물하기_실패() throws Exception{
+        //given
+        reviewRepository.save(
+                Review.builder()
+                        .content(content)
+                        .phoneNumber(phoneNumber)
+                        .build()
+        );
+        given()
+                .accept(MediaType.APPLICATION_JSON_VALUE)
+        .when()
+                .put("reviews/1000")
+        .then()
+                .statusCode(HttpStatus.NOT_FOUND.value());
     }
 
 }

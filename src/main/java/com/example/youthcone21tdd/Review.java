@@ -1,8 +1,7 @@
 package com.example.youthcone21tdd;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -10,6 +9,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class Review {
     
     @Id
@@ -23,17 +23,21 @@ public class Review {
     @Column(name = "PHONE_NUMBER")
     private String phoneNumber;
 
+    @Column(name = "IS_SENT")
+    private Boolean isSent;
 
-
-    public Long getId(){
-        return id;
+    public Review(Long id, String content, String phoneNumber) {
+        this.id = id;
+        this.content = content;
+        this.phoneNumber = phoneNumber;
     }
 
-    public String getContent() {
-        return content;
+    public void makeTrue(){
+        this.isSent = true;
     }
 
-    public String getPhoneNumber() {
-        return phoneNumber;
+    @PrePersist
+    public void prePersistYn() {
+        this.isSent = false;
     }
 }
